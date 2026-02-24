@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER-FORENSIC ANALYZER v5.9 | Jayasankha-dev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;700&display=swap');
+        
+        :root {
+            /* New Color Palette: Electric Blue & Dark Slate */
+            --neon-blue: #00d2ff;
+            --deep-cyan: #3a7bd5;
+            --dark-bg: #0a0e14;
+            --terminal-bg: #11171f;
+        }
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--dark-bg);
+            color: var(--neon-blue);
+            scroll-behavior: smooth;
+        }
+
+        .glow {
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(0, 210, 255, 0.4);
+        }
+
+        .terminal-box {
+            background: var(--terminal-bg);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-link:hover {
+            color: white;
+            text-shadow: 0 0 8px white;
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, var(--neon-blue), var(--deep-cyan));
+            color: #000;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gradient-btn:hover {
+            box-shadow: 0 0 30px var(--neon-blue);
+            transform: translateY(-3px);
+            color: #fff;
+        }
+
+        .feature-card:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <nav class="p-6 flex justify-between items-center border-b border-gray-800 bg-[#0a0e14]/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="text-xl md:text-2xl font-bold glow tracking-tighter italic">CYBER-FORENSIC v5.9</div>
+        <div class="space-x-8 hidden md:flex items-center">
+            <a href="#features" class="nav-link transition">System</a>
+            <a href="#terminal" class="nav-link transition">Preview</a>
+            <a href="https://github.com/Jayasankha-dev/CYBER-FORENSIC-ANDROID-ANALYZER-v5.9.git" target="_blank" class="gradient-btn px-6 py-2 rounded-lg text-sm uppercase tracking-wider">GitHub Repo</a>
+        </div>
+    </nav>
+
+    <header class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative">
+        <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(var(--neon-blue) 1px, transparent 1px), linear-gradient(90deg, var(--neon-blue) 1px, transparent 1px); background-size: 50px 50px;"></div>
+        
+        <h1 class="text-6xl md:text-9xl font-extrabold mb-6 glow tracking-tighter text-white">ELITE ANALYZER</h1>
+        <p class="text-lg md:text-2xl text-blue-200/60 max-w-3xl mb-12 font-light">
+            Advanced forensic acquisition engine for Android ecosystems. 
+            Engineered for <span class="text-white font-bold font-mono">stability, speed, and precision.</span>
+        </p>
+        
+        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 z-10">
+            <a href="https://github.com/Jayasankha-dev/CYBER-FORENSIC-ANDROID-ANALYZER-v5.9/archive/refs/heads/main.zip" class="gradient-btn px-12 py-5 rounded-full text-lg shadow-lg">INITIALIZE DOWNLOAD</a>
+            <a href="#terminal" class="border border-cyan-500/50 text-cyan-400 px-12 py-5 rounded-full text-lg hover:bg-cyan-500/10 transition backdrop-blur-sm">LIVE CONSOLE</a>
+        </div>
+    </header>
+
+    <section id="features" class="py-24 px-6 relative">
+        <h2 class="text-4xl font-bold text-center mb-20 text-white tracking-widest underline decoration-sky-500 underline-offset-8">CAPABILITIES_MANIFEST</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto">
+            
+            <div class="terminal-box feature-card p-10 rounded-2xl transition duration-500">
+                <div class="w-14 h-14 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-microchip text-3xl text-blue-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 text-white font-mono">Core Extraction</h3>
+                <p class="text-blue-200/50 leading-relaxed">Automated dumping of SMS, Call Logs, and Contacts with multi-thread stabilization.</p>
+            </div>
+
+            <div class="terminal-box feature-card p-10 rounded-2xl transition duration-500">
+                <div class="w-14 h-14 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fas fa-photo-video text-3xl text-cyan-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 text-white font-mono">Media Retrieval</h3>
+                <p class="text-blue-200/50 leading-relaxed">Advanced recursive scanning for MP4, MKV, JPG, and encrypted document formats.</p>
+            </div>
+
+            <div class="terminal-box feature-card p-10 rounded-2xl transition duration-500">
+                <div class="w-14 h-14 bg-indigo-500/20 rounded-lg flex items-center justify-center mb-6">
+                    <i class="fab fa-telegram-plane text-3xl text-indigo-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4 text-white font-mono">IM Forensics</h3>
+                <p class="text-blue-200/50 leading-relaxed">Targeted acquisition for Telegram and WhatsApp media vaults and local backups.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="terminal" class="py-20 px-6 bg-[#070b10]">
+        <div class="max-w-5xl mx-auto terminal-box rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+            <div class="bg-gray-900/80 p-4 flex justify-between items-center border-b border-gray-800">
+                <div class="flex space-x-2">
+                    <div class="w-3 h-3 bg-[#ff5f56] rounded-full"></div>
+                    <div class="w-3 h-3 bg-[#ffbd2e] rounded-full"></div>
+                    <div class="w-3 h-3 bg-[#27c93f] rounded-full"></div>
+                </div>
+                <span class="text-xs text-gray-500 font-mono tracking-widest">jayasankha-dev@forensic-terminal</span>
+            </div>
+            <div class="p-10 text-sm md:text-xl space-y-4 font-mono">
+                <p class="text-gray-400"><span class="text-blue-400">➜</span> <span class="text-cyan-400">~</span> git clone https://github.com/Jayasankha-dev/CYBER-FORENSIC-ANDROID-ANALYZER-v5.9.git</p>
+                <p class="text-gray-600">Receiving objects: 100% (452/452), 12.45 MiB | 4.10 MiB/s, done.</p>
+                <p class="text-gray-400"><span class="text-blue-400">➜</span> <span class="text-cyan-400">analyzer</span> ./analyzer.bat</p>
+                <p class="text-white font-bold mt-4">--- ELITE DATA SNATCHER INITIALIZED ---</p>
+                <p class="text-cyan-300">[*] ADB STATUS: CONNECTED [Device: %serial%]</p>
+                <p class="text-blue-400">[*] ACQUIRING MULTIMEDIA (MP4/MKV)...</p>
+                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                    <div class="bg-cyan-500 h-full w-3/4 animate-pulse"></div>
+                </div>
+                <p class="text-white text-xs opacity-50 italic">Processing: /sdcard/Android/media/org.telegram.messenger...</p>
+                <p class="animate-pulse cursor text-cyan-400">█</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 text-center relative overflow-hidden">
+        <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <h3 class="text-3xl font-bold mb-10 text-white">Join the development on GitHub</h3>
+        <a href="https://github.com/Jayasankha-dev/CYBER-FORENSIC-ANDROID-ANALYZER-v5.9.git" target="_blank" class="border-2 border-cyan-500 text-cyan-400 px-12 py-4 rounded-xl hover:bg-cyan-500 hover:text-black font-bold transition-all duration-300 transform hover:scale-105 inline-flex items-center">
+            <i class="fab fa-github text-2xl mr-3"></i> REPOSITORY
+        </a>
+    </section>
+
+    <footer class="py-12 border-t border-gray-900 bg-black text-center">
+        <p class="text-gray-500 font-light">Maintained by <a href="https://github.com/Jayasankha-dev" class="text-blue-400 hover:glow transition">Jayasankha-dev</a></p>
+        <div class="mt-4 flex justify-center space-x-6 text-gray-600">
+            <i class="fab fa-python hover:text-blue-400 cursor-pointer"></i>
+            <i class="fas fa-terminal hover:text-blue-400 cursor-pointer"></i>
+            <i class="fab fa-android hover:text-blue-400 cursor-pointer"></i>
+        </div>
+        <p class="mt-6 text-[10px] text-gray-800 uppercase tracking-[0.3em]">Authorized Personnel Only | © 2026</p>
+    </footer>
+
+</body>
+</html>
