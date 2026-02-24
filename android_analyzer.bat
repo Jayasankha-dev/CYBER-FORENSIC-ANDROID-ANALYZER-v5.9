@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
-title CYBER-FORENSIC ANDROID ANALYZER v5.8
-mode con: cols=110 lines=45
+title CYBER-FORENSIC ANDROID ANALYZER v5.9
+mode con: cols=110 lines=9000000
 color 0A
 
 :: ====================================================
@@ -57,6 +57,7 @@ echo    [2]  NETWORK SCAN       [7]  SECURE WIPE (SDCARD)
 echo    [3]  ADVANCED APPS      [8]  EXTRACT USER APKs
 echo    [4]  SYSTEM INTEGRITY   [9]  REBOOT OPTIONS
 echo    [5]  LIVE LOGCAT        [C]  CUSTOM ADB SHELL
+echo    [A]  ADVANCED FORENSIC SUITE (Malware Scanner,Live Monitor)
 echo.
 echo    --- FORENSIC DATA EXTRACTION ---
 echo    [S]  CAPTURE SCREENSHOT    [M]  DUMP SMS MESSAGES
@@ -85,6 +86,7 @@ if /i "%task%"=="L" goto DUMP_CALLS
 if /i "%task%"=="P" goto DEPLOY_FILES
 if /i "%task%"=="G" goto MULTI_PULL
 if /i "%task%"=="C" goto CUSTOM_CMD
+if /i "%task%"=="A" goto ADVANCED_HOME
 if /i "%task%"=="0" exit
 goto MAIN_MENU
 
@@ -363,9 +365,363 @@ goto MAIN_MENU
 :CUSTOM_CMD
 cls
 color 0F
-echo Type 'exit' to return.
+:: Methana call karanne script eke yata thiyana SIM_TYPE ekata
+call :SIM_TYPE "--- INTERACTIVE ADB SHELL INTERFACE ---"
+echo.
+echo Type 'exit' to return to Dashboard.
+echo ------------------------------------------------------------
+echo.
+
 :cmdloop
+:: User input ganna thana
+set "usercmd="
 set /p "usercmd=ADB_SHELL@%serial%:~# "
+
+:: 'exit' gahuwoth Main Menu ekata yanawa
 if /i "%usercmd%"=="exit" goto MAIN_MENU
+:: Nikanma Enter gahuwoth loop eka digata yanawa
+if "%usercmd%"=="" goto cmdloop
+
+:: ADB shell eka haraha command eka execute kireema
+echo.
 %ADB% shell %usercmd%
+echo.
 goto cmdloop
+
+:: ====================================================
+:: HELPER: SIMULATED TYPEWRITER EFFECT (Only keep ONE copy at the bottom)
+:: ====================================================
+:SIM_TYPE
+set "text=%~1"
+set "char_idx=0"
+:type_loop
+set "char=!text:~%char_idx%,1!"
+if "!char!"=="" echo. & exit /b
+<nul set /p "=!char!"
+:: Delay eka (300 kiyanne normal speed ekak)
+for /l %%a in (1,1,300) do rem
+set /a char_idx+=1
+goto type_loop
+
+:: ====================================================
+:: [A] ADVANCED FORENSIC & REAL-TIME MONITORING
+:: ====================================================
+:ADVANCED_HOME
+cls
+color 0B
+echo ==========================================================================
+echo           CYBER-FORENSIC ADVANCED MODULE - MULTI-PHASE ENGINE
+echo ==========================================================================
+echo    [1]  HYBRID MALWARE SCAN (Auto + Manual Typewriter Mode)
+echo    [2]  LIVE TRAFFIC MONITOR (Netstat / Network Streams)
+echo    [3]  PROCESS,RESOURCE TRACKER (CPU / RAM Live)
+echo    [4]  SYSTEM OVERLAY DETECTOR (Identify Hidden Windows)
+echo    [5]  CLIPBOARD FORENSICS (Extract Live Snippets)
+echo     [H]  PANIC MODE: QUICK HACK-DUMP (Extract All)
+echo    [0]  RETURN TO MAIN DASHBOARD
+echo --------------------------------------------------------------------------
+set /p adv_choice="[?] SELECT ADVANCED ACTION: "
+
+if "%adv_choice%"=="1" goto ADV_AUTO_SCAN
+if "%adv_choice%"=="2" goto LIVE_NET_MONITOR
+if "%adv_choice%"=="3" goto LIVE_PROC_MONITOR
+if "%adv_choice%"=="4" goto OVERLAY_CHECK
+if "%adv_choice%"=="5" goto CLIP_EXTRACT
+if /i "%adv_choice%"=="H" goto QUICK_HACK
+if "%adv_choice%"=="0" goto MAIN_MENU
+goto ADV_HOME
+
+:: ====================================================
+:: [1] HYBRID MALWARE SCANNER (ENHANCED & STABLE)
+:: ====================================================
+:ADV_AUTO_SCAN
+cls
+color 0A
+echo ==========================================================================
+echo          INTEL-CORE: MULTI-PHASE SYSTEM INTEGRITY AUDIT
+echo ==========================================================================
+echo  [*] INITIALIZING HEURISTIC ANALYSIS ENGINE...
+echo.
+
+:: --- PHASE A: DIRECTORY INTEGRITY ---
+:: Removed '&' to prevent command-line crashes
+echo [PHASE 1]: AUDITING TEMPORARY AND HIDDEN STORAGE...
+set "cmd_a=adb shell ls -laR /data/local/tmp /sdcard/ ^| grep '^\.'"
+call :SIM_TYPE "[EXEC_AUDIT]: !cmd_a!" 25
+
+echo --------------------------------------------------------------------------
+:: Auditing temp directory for suspicious payloads
+%ADB% shell "ls -la /data/local/tmp"
+echo --------------------------------------------------------------------------
+echo [REPORT]: Analyzing directory for unauthorized binary executions...
+
+echo.
+echo [?] MANUAL OVERRIDE: Would you like to explore these paths manually? (Y/N)
+set /p "minp=>> "
+if /i "%minp%"=="Y" (
+    echo.
+    echo ============================================================
+    echo           MANUAL FORENSIC COMMANDS (CHEATSHEET)
+    echo ============================================================
+    echo  1. ls -laR /sdcard/ ^| grep '^\.'  (View Hidden Files)
+    echo  2. ls -F /data/local/tmp/         (View Executables)
+    echo  3. exit                            (Return to Auto-Scan)
+    echo ============================================================
+    %ADB% shell
+    echo [*] RESUMING AUTOMATED AUDIT...
+)
+
+:: --- PHASE B: DEEP APPLICATION ANALYSIS ---
+echo.
+echo [PHASE 2]: ANALYZING THIRD-PARTY PACKAGE SIGNATURES...
+timeout /t 1 >nul
+
+for /f "tokens=2 delims=:" %%p in ('%ADB% shell pm list packages -3') do (
+    set "pkg=%%p"
+    set "pkg=!pkg:~0,-1!"
+    set "risk=0"
+    set "reasons="
+    
+    :: Clean inline output for package auditing
+    <nul set /p "=[AUDITING]: !pkg! "
+    
+    :: Logic 1: Keyword Analysis (Name Spoofing)
+    echo !pkg! | findstr /i "spy stealer tracker remote hack trojan" >nul
+    if !errorlevel! equ 0 (
+        set /a risk+=5
+        set "reasons=!reasons! [Suspicious Name]"
+    )
+    
+    :: Logic 2: Accessibility Abuse Check
+    %ADB% shell "dumpsys package !pkg! | grep BIND_ACCESSIBILITY_SERVICE" >nul
+    if !errorlevel! equ 0 (
+        set /a risk+=10
+        set "reasons=!reasons! [Accessibility Privilege]"
+    )
+
+    :: Risk Reporting
+    if !risk! geq 5 (
+        echo.
+        color 0C
+        echo    --------------------------------------------------------
+        echo    [!] CRITICAL ALERT: HIGH RISK DETECTED
+        echo    [PACKAGE]: !pkg!
+        echo    [SCORE  ]: !risk!/15
+        echo    [REASONS]: !reasons!
+        echo    --------------------------------------------------------
+        echo    [1] View Permissions  [2] View Install Source  [3] Skip
+        set /p "s_act=>> "
+        if "!s_act!"=="1" %ADB% shell "dumpsys package !pkg! | grep android.permission" && pause
+        if "!s_act!"=="2" %ADB% shell "pm get-install-source !pkg!" && pause
+        color 0A
+    ) else (
+        echo [OK]
+    )
+    :: Forensic delay for visual effect
+    for /l %%a in (1,1,100) do rem 
+)
+
+echo.
+echo ==========================================================================
+echo [+] SYSTEM AUDIT COMPLETED SUCCESSFULLY.
+echo ==========================================================================
+pause
+goto ADVANCED_HOME
+
+:: ====================================================
+:: [2] LIVE NETWORK MONITOR (REAL-TIME SCROLL)
+:: ====================================================
+:LIVE_NET_MONITOR
+cls
+color 0B
+echo.
+echo  __________________________________________________________
+echo ^|                                                          ^|
+echo ^|    NET-TRACE : REAL-TIME NETWORK FORENSIC STREAM         ^|
+echo ^|__________________________________________________________^|
+echo.
+echo  [*] TARGET DEVICE : %serial%
+echo  [*] STREAM STATUS : ACTIVE MONITORING
+echo  [*] [EXIT]        : PRESS 'Q' TO RETURN TO ADVANCED MENU
+echo -----------------------------------------------------------
+echo   LOCAL IP             REMOTE IP            STATE
+echo -----------------------------------------------------------
+
+:net_loop
+:: Fetching live connections. Using ^| to ensure stability.
+%ADB% shell "netstat -ant ^| grep ESTABLISHED"
+
+:: Logic: Wait 1 second. If no key is pressed, default to 'C' (Continue).
+:: This stops the "auto-exit" bug you had before.
+choice /c qc /n /t 1 /d c >nul 2>&1
+
+:: If 'Q' is pressed (Choice 1), exit the loop.
+if %errorlevel% equ 1 (
+    echo.
+    echo  [!] TERMINATING DATA STREAM...
+    timeout /t 1 >nul
+    goto ADVANCED_HOME
+)
+
+:: Loop back for the scrolling effect
+goto net_loop
+
+:: ====================================================
+:: [3] LIVE PROCESS MONITOR (FINAL STABLE VERSION)
+:: ====================================================
+:LIVE_PROC_MONITOR
+cls
+color 0B
+echo ==========================================================================
+echo          REAL-TIME RESOURCE AUDIT: CPU AND PROCESS MONITORING
+echo ==========================================================================
+echo  [*] TIMESTAMP  : %date% ^| %time%
+echo  [*] ANALYZER   : CYBER-FORENSIC ENGINE v5.8
+echo  [*] TARGET     : %serial%
+echo --------------------------------------------------------------------------
+echo  [SYSTEM LOG]: Capturing active process execution tree...
+echo.
+
+:: Just run the top command. It's the most reliable way.
+%ADB% shell "top -n 1"
+
+echo.
+echo --------------------------------------------------------------------------
+echo  [MEMORY USAGE SUMMARY]:
+:: Using Android's internal grep to avoid "findstr not found" error
+%ADB% shell "dumpsys meminfo | grep 'Used RAM'"
+echo --------------------------------------------------------------------------
+echo  [ACTION]: PRESS ANY KEY TO RETURN TO THE ADVANCED MENU...
+pause >nul
+goto ADVANCED_HOME
+
+:OVERLAY_CHECK
+cls
+color 0E
+echo ============================================================
+echo [!] MONITORING ACTIVE WINDOW FOCUS (Overlay Detector)
+echo ============================================================
+echo [*] Target Device: %serial%
+echo [*] Instruction  : Interact with the phone to see focus changes.
+echo [*] Exit         : Press 'Q' to return to Advanced Menu.
+echo ------------------------------------------------------------
+
+:win_loop
+:: Fetching only the current focused window
+<nul set /p "= [LIVE FOCUS]: "
+%ADB% shell "dumpsys window | grep -E 'mCurrentFocus|mFocusedApp'"
+
+:: Waiting 1 second. 'Q' gahuwoth exit wenawa, nathi nam Continue (C) wenawa.
+choice /c qc /n /t 1 /d c >nul 2>&1
+
+if %errorlevel% equ 1 (
+    echo.
+    echo [*] Stopping Overlay Monitor...
+    timeout /t 1 >nul
+    goto ADVANCED_HOME
+)
+
+goto win_loop
+
+
+:CLIP_EXTRACT
+cls
+color 0D
+echo ============================================================
+echo [!] ACTION: EXTRACTING LIVE CLIPBOARD DATA
+echo ============================================================
+
+:: Phone eka awake karala screen eka focus kireema
+%ADB% shell input keyevent 82 >nul 2>&1
+
+echo [*] Method 1: Checking Service State...
+echo ------------------------------------------------------------
+
+:: Method 1: Dumpsys clipboard (Meka godak welawata wada karanawa)
+:: Meken clipboard eke thiyana anthima text eka hoyaganna puluwan
+%ADB% shell dumpsys clipboard | findstr "mText"
+
+echo.
+echo [*] Method 2: Raw Parcel Analysis...
+:: Method 2: Service call (Hex output)
+%ADB% shell service call clipboard 2 | findstr "Result"
+
+echo ------------------------------------------------------------
+echo.
+echo [ADVISORY]
+echo 1. If 'mText' is missing, the clipboard is EMPTY.
+echo 2. On Android 12+, you MUST have the screen ON and 
+echo    be on the Home Screen or in an App for this to work.
+echo 3. Some OEMs (Samsung/Xiaomi) block this entirely via ADB.
+echo.
+pause
+goto ADVANCED_HOME
+
+:: ====================================================
+:: [H] ELITE DATA SNATCHER (MULTI-THREADED & DEEP SCAN)
+:: ====================================================
+:QUICK_HACK
+cls
+color 0C
+echo ==========================================================================
+echo            !!! WARNING: INITIATING ELITE EXTRACTION PROTOCOL !!!
+echo ==========================================================================
+
+:: Generating Secure Timestamp for Folder Naming
+set "t=%time: =0%"
+set "TSTAMP=%t:~0,2%%t:~3,2%%t:~6,2%"
+set "HACK_DIR=ELITE_DUMP_%serial%_%TSTAMP%"
+mkdir "%HACK_DIR%" 2>nul
+
+echo [*] PHASE 1: ACQUIRING SYSTEM ^& APP DATABASE RECORDS...
+:: Creating dedicated database sub-directory
+mkdir "%HACK_DIR%\Databases"
+echo [LOG] Extracting SMS Messages...
+%ADB% shell "content query --uri content://sms/" > "%HACK_DIR%\Databases\sms.txt" 2>nul
+echo [LOG] Extracting Contact Lists...
+%ADB% shell "content query --uri content://com.android.contacts/data" > "%HACK_DIR%\Databases\contacts.txt" 2>nul
+echo [LOG] Extracting Call Histories...
+%ADB% shell "content query --uri content://call_log/calls" > "%HACK_DIR%\Databases\calls.txt" 2>nul
+
+echo [*] PHASE 2: EXECUTING DEEP STORAGE DISCOVERY (PDF, DOCX, ZIP)...
+:: Crawling the entire SDCard for high-value document types
+%ADB% shell "find /sdcard/ -type f \( -name '*.pdf' -o -name '*.docx' -o -name '*.zip' \)" > "%HACK_DIR%\discovered_files.txt" 2>nul
+
+echo [*] PHASE 3: BUNDLING MULTIMEDIA ^& ENCRYPTED APP CONTAINERS...
+:: Target paths for Telegram, WhatsApp, and System Media
+set "T_MEDIA=/sdcard/Android/media/org.telegram.messenger /sdcard/Telegram"
+set "W_MEDIA=/sdcard/Android/media/com.whatsapp /sdcard/WhatsApp"
+set "S_MEDIA=/sdcard/DCIM /sdcard/Download /sdcard/Pictures /sdcard/Movies"
+
+echo [!] Bundling High-Capacity Stream - Do Not Disconnect Device...
+:: Tar bundling handles MP4, MKV, JPG, and other extensions automatically within paths
+%ADB% shell "tar -cvf /sdcard/snatch.tar %T_MEDIA% %W_MEDIA% %S_MEDIA% 2>/dev/null"
+echo [!] Pulling Archive to Host PC...
+%ADB% pull /sdcard/snatch.tar "%HACK_DIR%\storage_bundle.tar"
+%ADB% shell "rm /sdcard/snatch.tar"
+
+echo [*] PHASE 4: NETWORK ^& VOLATILE DATA ACQUISITION...
+echo [LOG] Dumping Wi-Fi Statistics...
+%ADB% shell "dumpsys wifi" > "%HACK_DIR%\wifi_dump.txt" 2>nul
+echo [LOG] Attempting Clipboard Extraction...
+%ADB% shell "service call clipboard 2" > "%HACK_DIR%\clipboard_raw.txt" 2>nul
+
+echo [*] PHASE 5: CAPTURING LIVE SCREEN EVIDENCE...
+%ADB% shell "screencap -p /sdcard/evid.png"
+%ADB% pull /sdcard/evid.png "%HACK_DIR%\forensic_screenshot.png" >nul
+%ADB% shell "rm /sdcard/evid.png"
+
+echo [*] PHASE 6: GENERATING EXTRACTION MANIFEST...
+:: List the contents of the grabbed folder for a quick summary
+dir "%HACK_DIR%" /B > "%HACK_DIR%\manifest.txt"
+
+echo ==========================================================================
+echo [+] ELITE EXTRACTION SUCCESSFUL!
+echo [+] DATA DIRECTORY: %HACK_DIR%
+echo --------------------------------------------------------------------------
+echo [ANALYSIS TIP]: Use '7-Zip' to inspect 'storage_bundle.tar'
+echo [NOTICE]: Large video files (MP4/MKV) are located inside the bundle.
+echo ==========================================================================
+pause
+goto ADVANCED_HOME
+
