@@ -1,0 +1,193 @@
+# 📱 Android Forensic & Security Audit: ADB Command Reference
+
+This guide provides a list of powerful ADB (Android Debug Bridge) commands used for live forensic analysis, malware hunting, and system integrity audits.
+
+---
+
+## 🔍 1. System Information & Environment Audit
+
+Identify the target device's hardware, OS details, and security patch levels.
+
+| Command | Description |
+| --- | --- |
+| `adb shell getprop ro.build.version.release` | Get the Android OS version. |
+| `adb shell getprop ro.build.version.security_patch` | Check the last security patch date (Critical for exploit analysis). |
+| `adb shell getprop ro.product.model` | Get the exact device model name. |
+| `adb shell uptime` | See how long the device has been running since the last reboot. |
+| `adb shell dumpsys battery` | View battery health, status, and voltage. |
+
+---
+
+## 🛡️ 2. Package & Malware Analysis
+
+Search for hidden apps, stalkerware, and unauthorized installations.
+
+| Command | Description |
+| --- | --- |
+| `adb shell pm list packages -3` | List all user-installed (3rd party) applications. |
+| `adb shell pm list packages -s` | List all system applications. |
+| `adb shell pm list packages -d` | List only disabled applications (Often used by malware to hide). |
+| `adb shell pm path <package_name>` | Locate the physical path of an APK file on the storage. |
+| `adb shell dumpsys package <package_name>` | Deep dive into an app: permissions, install source, and signatures. |
+| `adb shell pm list permissions -g -u` | List all dangerous permissions requested by apps. |
+
+---
+
+## 🌐 3. Network Forensic Monitoring
+
+Detect suspicious outbound connections, C2 (Command & Control) traffic, or open ports.
+
+| Command | Description |
+| --- | --- |
+| `adb shell netstat -ant` | Show all active network connections (Look for "ESTABLISHED"). |
+| `adb shell netstat -lnt` | Show all listening ports on the device. |
+| `adb shell ip addr` | View the device's local IP address and network interfaces. |
+| `adb shell dumpsys wifi` | Get detailed Wi-Fi logs, including saved SSIDs and MAC addresses. |
+
+---
+
+## 📂 4. File System & Storage Investigation
+
+Crawl the file system for hidden payloads, logs, and encrypted databases.
+
+| Command | Description |
+| --- | --- |
+| `adb shell ls -laR /sdcard/` | Recursively list all files including hidden ones (prefixed with `.`). |
+| `adb shell find /sdcard/ -name "*.php" -o -name "*.sh"` | Search for web shells or malicious scripts in storage. |
+| `adb shell ls -la /data/local/tmp` | Check the temp folder (Commonly used by hackers to execute binaries). |
+| `adb shell df -h` | View partition usage (Look for unusually full system partitions). |
+
+---
+
+## 🕵️ 5. Live Evidence & Volatile Data
+
+Extract data that changes frequently, such as logs, clipboard, and active processes.
+
+| Command | Description |
+| --- | --- |
+| `adb logcat -v time -d > log.txt` | Dump the system log buffer to a text file for offline analysis. |
+| `adb shell dumpsys window | grep mCurrentFocus` |
+| `adb shell top -n 1 -m 15` | View the top 15 CPU-consuming processes (Identify cryptojackers). |
+| `adb shell dumpsys clipboard` | Extract current clipboard contents (mText). |
+| `adb shell service call clipboard 2` | Raw retrieval of clipboard service data. |
+
+---
+
+## 📑 6. Database & PII Extraction (Personal Info)
+
+Extract user data for forensic reporting.
+
+| Command | Description |
+| --- | --- |
+| `adb shell content query --uri content://sms/` | Dump all SMS messages (Inbound/Outbound). |
+| `adb shell content query --uri content://call_log/calls` | Extract full call history. |
+| `adb shell content query --uri content://com.android.contacts/data` | Extract the contact list and associated emails/numbers. |
+| `adb shell screencap -p /sdcard/sc.png` | Capture a screenshot for evidence. |
+
+---
+
+## 🚀 7. Advanced Recovery & Shell Operations
+
+| Command | Description |
+| --- | --- |
+| `adb reboot recovery` | Boot into recovery mode (For imaging or bypassing locks). |
+| `adb shell pm grant <pkg> <permission>` | Manually grant a permission to an app (Useful for testing). |
+| `adb shell am force-stop <pkg>` | Kill a suspicious process immediately. |
+| `adb push <local_file> /sdcard/` | Move forensic tools from PC to Phone. |
+| `adb pull /sdcard/<remote_file> .` | Move evidence from Phone to PC. |
+
+
+
+---
+
+### 🛡️ 8. Persistence & Auto-Start Investigation
+
+Malware godak welawata phone eka restart karama ayeth auto-start wenna permissions gannawa. Ewa hoyanna me commands use karanna.
+
+| Command | Description |
+| --- | --- |
+| `adb shell dumpsys activity services` | List all currently running background services (Look for unknown names). |
+| `adb shell dumpsys alarm` | Check scheduled tasks/alarms (Malware uses this to wake up at specific times). |
+| `adb shell cmd package list-broadcast-receivers` | List apps that listen for "BOOT_COMPLETED" (Apps that start when phone turns on). |
+| `adb shell appops query-op RUN_IN_BACKGROUND allow` | List all apps that are allowed to run in the background. |
+
+---
+
+### 👤 9. User Account & Identity Forensics
+
+Phone eke register wela thiyena Google, Facebook, saha anith account details balanna.
+
+| Command | Description |
+| --- | --- |
+| `adb shell dumpsys account` | Show all registered accounts (Emails, Usernames) on the device. |
+| `adb shell pm list users` | Check if there are multiple user profiles or "Work Profiles" (Often used to hide apps). |
+| `adb shell settings get secure android_id` | Get the unique Android ID of the device for tracking. |
+| `adb shell dumpsys user` | Get detailed info about the primary user and their privileges. |
+
+---
+
+### 📁 10. Advanced Application Auditing
+
+App ekaka "Attack Surface" eka check karanna meka wadagath.
+
+| Command | Description |
+| --- | --- |
+| `adb shell dumpsys package  | grep -A 10 "Permissions:"` |
+| `adb shell dumpsys package  | grep "firstInstallTime"` |
+| `adb shell dumpsys package  | grep "lastUpdateTime"` |
+| `adb shell dumpsys procstats --hours 24` | See which apps were running in the last 24 hours and their RAM usage. |
+
+---
+
+### 🛰️ 11. Hardware & Sensor Forensics
+
+Sensors (Camera, Mic, GPS) use karana eka monitor karanna.
+
+| Command | Description |
+| --- | --- |
+| `adb shell dumpsys sensor_service` | Check if any app is currently using sensors (Like Mic or Camera). |
+| `adb shell dumpsys location` | View recent GPS/Location requests from apps. |
+| `adb shell dumpsys media.camera` | See which app last accessed the camera. |
+| `adb shell dumpsys audio` | View audio stream status (Check if someone is recording/listening). |
+
+---
+
+### 🛠️ 12. Security Setting Audits
+
+Phone eke security features "Off" karalada kiyala balanna.
+
+| Command | Description |
+| --- | --- |
+| `adb shell settings get global adb_enabled` | Check if ADB is permanently enabled (Security risk). |
+| `adb shell settings get secure install_non_market_apps` | Check if "Unknown Sources" is turned ON. |
+| `adb shell settings get global development_settings_enabled` | See if Developer Options are active. |
+| `adb shell locksettings verify --password <pwd>` | Verify if a password works (Use only with authorization). |
+
+---
+
+### 🛑 13. Emergency & Incident Response
+
+Something is wrong? Use these fast.
+
+| Command | Description |
+| --- | --- |
+| `adb shell pm disable-user <package_name>` | Instantly "Freeze" a suspicious app without uninstalling it (Preserves evidence). |
+| `adb shell pm clear <package_name>` | Wipe an app's data and cache immediately. |
+| `adb shell pkill -f <process_name>` | Kill a process by its name. |
+| `adb shell input keyevent 26` | Toggle Power button (Force screen off/on). |
+
+---
+
+### 💡 Analyst Tip: Pipe & Filter
+
+Output eka godak loku nam, `grep` (Linux) hari `findstr` (Windows) use karanna:
+
+* *Example:* `adb shell dumpsys activity | findstr "mResumedActivity"` (Kelinma screen eke active app eka balanna).
+
+
+### 💡 Security Analyst Tip:
+
+Always pipe long outputs into a file or use `more` to prevent data loss in the terminal buffer.
+*Example:* `adb shell dumpsys package com.whatsapp | more`
+
+
