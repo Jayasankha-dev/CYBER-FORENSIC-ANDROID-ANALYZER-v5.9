@@ -755,15 +755,17 @@ echo ==========================================================================
 echo                NETWORK INTELLIGENCE ^& GEO-IP ANALYSIS
 echo ==========================================================================
 echo    [1]  LIVE TRAFFIC MONITOR (With Geo-Location Tags)
-echo    [2]  IP REPUTATION CHECKER (Paste ^& Analyze Origins)
-echo    [3]  UID RESOLVER (Find App Name from Android UID
+echo    [2]  LIVE TRAFFIC MONITOR (With Geo-Location Tags)-2
+echo    [3]  IP REPUTATION CHECKER (Paste ^& Analyze Origins)
+echo    [4]  UID RESOLVER (Find App Name from Android UID
 echo    [0]  BACK TO ADVANCED MENU
 echo --------------------------------------------------------------------------
 set /p net_choice="[?] SELECT ACTION: "
 
 if "%net_choice%"=="1" goto LIVE_NET_MONITOR
-if "%net_choice%"=="2" goto IP_REPUTATION_CHECKER
-if "%net_choice%"=="3" goto UID_RESOLVER_TOOL
+if "%net_choice%"=="2" goto LIVE_NET_MONITOR-2
+if "%net_choice%"=="3" goto IP_REPUTATION_CHECKER
+if "%net_choice%"=="4" goto UID_RESOLVER_TOOL
 if "%net_choice%"=="0" goto ADVANCED_HOME
 goto SHOW_NET_MENU
 
@@ -800,6 +802,41 @@ if "%net_opt%"=="0" goto NETWORK_INTELLIGENCE_MENU
 
 :: If they press anything else, just refresh anyway
 goto LIVE_NET_MONITOR
+
+
+:LIVE_NET_MONITOR-2
+:: 'cls' clears the previous table so the new one starts at the top
+cls
+echo ==========================================================================
+echo           LIVE TRAFFIC MONITOR WITH GEOLOCATION INTELLIGENCE
+echo ==========================================================================
+echo [*] Fetching Network Streams from Device...
+
+:: Logic update idea
+if "!state!"=="ESTABLISHED" (
+    set "owner_info=[UID:!uid!]"
+) else (
+    set "owner_info=[System/Kernel Handover]"
+)
+
+:: Use -tuapne to ensure the UID is included in the output
+%ADB% shell "netstat -tuapne" > bin\temp_net2.txt 2>nul
+
+:: Call Python to analyze and print the results
+python bin\new_method.py bin\temp_net2.txt
+
+echo --------------------------------------------------------------------------
+echo [R] REFRESH STREAM   [0] RETURN TO MENU
+echo --------------------------------------------------------------------------
+set /p net_opt="[?] SELECT ACTION: "
+
+:: /i makes it work for both 'r' and 'R'
+if /i "%net_opt%"=="R" goto LIVE_NET_MONITOR-2
+if "%net_opt%"=="0" goto NETWORK_INTELLIGENCE_MENU
+
+:: If they press anything else, just refresh anyway
+goto LIVE_NET_MONITOR-2
+
 
 :IP_REPUTATION_CHECKER
 cls
