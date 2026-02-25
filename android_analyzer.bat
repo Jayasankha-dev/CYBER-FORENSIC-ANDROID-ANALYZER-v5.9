@@ -109,6 +109,36 @@ pause
 goto MAIN_MENU
 
 :: ====================================================
+:: [G] SMART MULTI-PULL (SELECT FOLDERS)
+:: ====================================================
+:MULTI_PULL
+cls
+color 0E
+echo [*] SCANNING SDCARD DIRECTORIES...
+echo ------------------------------------------------------------
+set count=0
+for /f "delims=" %%d in ('%ADB% shell "ls -d /sdcard/*/ 2>/dev/null"') do (
+    set /a count+=1
+    set "folder[!count!]=%%d"
+    echo [!count!] %%d
+)
+echo ------------------------------------------------------------
+echo [TIP] Enter folder numbers separated by SPACES (e.g. 1 3 5)
+set /p "selection=[?] Select folder numbers to PULL: "
+echo.
+for %%n in (%selection%) do (
+    set "target_path=!folder[%%n]!"
+    set "target_name=!target_path:~0,-1!"
+    set "target_name=!target_name:/sdcard/=!"
+    echo [*] Downloading: !target_name!
+    %ADB% pull "!target_path!." "%PULL_DIR%\!target_name!"
+)
+echo [+] Selection pulled to %PULL_DIR%
+pause
+goto MAIN_MENU
+
+
+:: ====================================================
 :: [P] PUSH FILES (DRAG ^& DROP)
 :: ====================================================
 :DEPLOY_FILES
@@ -305,7 +335,7 @@ goto MAIN_MENU
 :CUSTOM_CMD
 cls
 color 0F
-:: Methana call karanne script eke yata thiyana SIM_TYPE ekata
+
 call :SIM_TYPE "--- INTERACTIVE ADB SHELL INTERFACE ---"
 echo.
 echo Type 'exit' to return to Dashboard.
@@ -313,16 +343,16 @@ echo ------------------------------------------------------------
 echo.
 
 :cmdloop
-:: User input ganna thana
+:: User input
 set "usercmd="
 set /p "usercmd=ADB_SHELL@%serial%:~# "
 
-:: 'exit' gahuwoth Main Menu ekata yanawa
+:: 'exit'
 if /i "%usercmd%"=="exit" goto MAIN_MENU
-:: Nikanma Enter gahuwoth loop eka digata yanawa
+
 if "%usercmd%"=="" goto cmdloop
 
-:: ADB shell eka haraha command eka execute kireema
+
 echo.
 %ADB% shell %usercmd%
 echo.
@@ -338,7 +368,7 @@ set "char_idx=0"
 set "char=!text:~%char_idx%,1!"
 if "!char!"=="" echo. & exit /b
 <nul set /p "=!char!"
-:: Delay eka (300 kiyanne normal speed ekak)
+
 for /l %%a in (1,1,300) do rem
 set /a char_idx+=1
 goto type_loop
@@ -555,7 +585,7 @@ echo ------------------------------------------------------------
 <nul set /p "= [LIVE FOCUS]: "
 %ADB% shell "dumpsys window | grep -E 'mCurrentFocus|mFocusedApp'"
 
-:: Waiting 1 second. 'Q' gahuwoth exit wenawa, nathi nam Continue (C) wenawa.
+
 choice /c qc /n /t 1 /d c >nul 2>&1
 
 if %errorlevel% equ 1 (
@@ -575,14 +605,13 @@ echo ============================================================
 echo [!] ACTION: EXTRACTING LIVE CLIPBOARD DATA
 echo ============================================================
 
-:: Phone eka awake karala screen eka focus kireema
+
 %ADB% shell input keyevent 82 >nul 2>&1
 
 echo [*] Method 1: Checking Service State...
 echo ------------------------------------------------------------
 
-:: Method 1: Dumpsys clipboard (Meka godak welawata wada karanawa)
-:: Meken clipboard eke thiyana anthima text eka hoyaganna puluwan
+:: Method 1: Dumpsys clipboard 
 %ADB% shell dumpsys clipboard | findstr "mText"
 
 echo.
