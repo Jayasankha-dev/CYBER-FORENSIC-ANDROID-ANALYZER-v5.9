@@ -90,81 +90,21 @@ if /i "%task%"=="A" goto ADVANCED_HOME
 if /i "%task%"=="0" exit
 goto MAIN_MENU
 
-:: ====================================================
-:: [8] EXTRACT APKs (FIXED)
-:: ====================================================
-:: ====================================================
-:: [8] EXTRACT APKs (STABLE VERSION)
-:: ====================================================
 :EXTRACT_APK
 cls
 color 0E
-if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
-
-echo [*] SCANNING FOR USER INSTALLED APPS...
-echo ------------------------------------------------------------
-
-:: Export package list to a temp file
-%ADB% shell pm list packages -3 > "%temp%\pkgs.txt"
-
-for /f "tokens=2 delims=:" %%p in ('type "%temp%\pkgs.txt"') do (
-    :: Clean the package name (removes the hidden carriage return)
-    set "pkg=%%p"
-    set "pkg=!pkg:~0,-1!"
-    
-    echo [PROCESS] Package: !pkg!
-    
-    :: Get the path of the APK on the phone
-    for /f "tokens=2 delims=:" %%a in ('%ADB% shell pm path !pkg!') do (
-        set "apkpath=%%a"
-        set "apkpath=!apkpath:~0,-1!"
-        
-        echo [PULLING] From: !apkpath!
-        
-        :: Execute the pull command
-        %ADB% pull "!apkpath!" "%OUT_DIR%\!pkg!.apk"
-        
-        if exist "%OUT_DIR%\!pkg!.apk" (
-            echo [+] SUCCESS: !pkg!.apk saved.
-        ) else (
-            echo [X] FAILED: Could not pull !pkg!. 
-            echo     (This happens if the app is a 'Split APK' or Protected)
-        )
-    )
-    echo ------------------------------------------------------------
-)
-
-del "%temp%\pkgs.txt"
-echo [+] Extraction Process Finished.
-pause
-goto MAIN_MENU
-
-:: ====================================================
-:: [G] SMART MULTI-PULL (SELECT FOLDERS)
-:: ====================================================
-:MULTI_PULL
-cls
-color 0E
-echo [*] SCANNING SDCARD DIRECTORIES...
-echo ------------------------------------------------------------
-set count=0
-for /f "delims=" %%d in ('%ADB% shell "ls -d /sdcard/*/ 2>/dev/null"') do (
-    set /a count+=1
-    set "folder[!count!]=%%d"
-    echo [!count!] %%d
-)
-echo ------------------------------------------------------------
-echo [TIP] Enter folder numbers separated by SPACES (e.g. 1 3 5)
-set /p "selection=[?] Select folder numbers to PULL: "
+echo ============================================================
+echo           STARTING ANDROID APK EXTRACTOR (PS)
+echo ============================================================
 echo.
-for %%n in (%selection%) do (
-    set "target_path=!folder[%%n]!"
-    set "target_name=!target_path:~0,-1!"
-    set "target_name=!target_name:/sdcard/=!"
-    echo [*] Downloading: !target_name!
-    %ADB% pull "!target_path!." "%PULL_DIR%\!target_name!"
-)
-echo [+] Selection pulled to %PULL_DIR%
+
+:: Pointing to the file inside the "bin" folder
+powershell -ExecutionPolicy Bypass -File "bin\extract.ps1"
+
+echo.
+echo ============================================================
+echo           PROCESS COMPLETED!
+echo ============================================================
 pause
 goto MAIN_MENU
 
@@ -417,7 +357,9 @@ echo    [2]  LIVE TRAFFIC MONITOR (Netstat / Network Streams)
 echo    [3]  PROCESS,RESOURCE TRACKER (CPU / RAM Live)
 echo    [4]  SYSTEM OVERLAY DETECTOR (Identify Hidden Windows)
 echo    [5]  CLIPBOARD FORENSICS (Extract Live Snippets)
-echo     [H]  PANIC MODE: QUICK HACK-DUMP (Extract All)
+echo    [H]  PANIC MODE: QUICK HACK-DUMP (Extract All)
+echo    [J]  ADVANCED APP CONTROL (Auto-Screenshots, Reset, Uninstall)
+echo    [T]  NETWORK INTELLIGENCE (Geo-IP Monitor, Reputation)
 echo    [0]  RETURN TO MAIN DASHBOARD
 echo --------------------------------------------------------------------------
 set /p adv_choice="[?] SELECT ADVANCED ACTION: "
@@ -428,6 +370,8 @@ if "%adv_choice%"=="3" goto LIVE_PROC_MONITOR
 if "%adv_choice%"=="4" goto OVERLAY_CHECK
 if "%adv_choice%"=="5" goto CLIP_EXTRACT
 if /i "%adv_choice%"=="H" goto QUICK_HACK
+if /i "%adv_choice%"=="J" goto APP_CONTROL_ADV
+if /i "%adv_choice%"=="T" goto NETWORK_INTELLIGENCE_MENU
 if "%adv_choice%"=="0" goto MAIN_MENU
 goto ADV_HOME
 
@@ -725,3 +669,167 @@ echo ==========================================================================
 pause
 goto ADVANCED_HOME
 
+:APP_CONTROL_ADV
+cls
+color 0B
+echo ============================================================
+echo           ADVANCED APP CONTROL SYSTEM (PS)
+echo ============================================================
+echo.
+powershell -ExecutionPolicy Bypass -File "bin\app_control.ps1"
+goto MAIN_MENU
+
+:NETWORK_INTELLIGENCE_MENU
+cls
+echo ==========================================================================
+echo                NETWORK INTELLIGENCE ^& GEO-IP ANALYSIS
+echo ==========================================================================
+echo [*] Initializing Advanced Modules...
+
+:: 1. Check if libraries are already extracted
+if exist "bin\geoip2" (
+    echo [+] Dependencies: READY
+    timeout /t 1 >nul
+    goto SHOW_NET_MENU
+)
+
+:: 2. If not extracted, check for the ZIP archive
+if exist "bin\geoip2_lib.zip" (
+    echo [!] Extracting local libraries... (First-time setup)
+    
+    :: Using Windows native tar command to extract into the bin folder
+    tar -xf "bin\geoip2_lib.zip" -C "bin"
+    
+    if %errorlevel% equ 0 (
+        echo [+] Extraction successful!
+        timeout /t 2 >nul
+        goto SHOW_NET_MENU
+    ) else (
+        color 0C
+        echo [ERROR] Failed to extract libraries. Ensure 'bin\geoip2_lib.zip' is not corrupted.
+        pause
+        color 0B
+        goto ADVANCED_HOME
+    )
+) else (
+    color 0C
+    echo [ERROR] Dependency archive (bin\geoip2_lib.zip) not found!
+    echo [!] Please ensure the required library pack is in the bin directory.
+    pause
+    color 0B
+    goto ADVANCED_HOME
+)
+
+:SHOW_NET_MENU
+cls
+echo ==========================================================================
+echo                NETWORK INTELLIGENCE ^& GEO-IP ANALYSIS
+echo ==========================================================================
+echo    [1]  LIVE TRAFFIC MONITOR (With Geo-Location Tags)
+echo    [2]  IP REPUTATION CHECKER (Paste ^& Analyze Origins)
+echo    [3]  UID RESOLVER (Find App Name from Android UID
+echo    [0]  BACK TO ADVANCED MENU
+echo --------------------------------------------------------------------------
+set /p net_choice="[?] SELECT ACTION: "
+
+if "%net_choice%"=="1" goto LIVE_NET_MONITOR
+if "%net_choice%"=="2" goto IP_REPUTATION_CHECKER
+if "%net_choice%"=="3" goto UID_RESOLVER_TOOL
+if "%net_choice%"=="0" goto ADVANCED_HOME
+goto SHOW_NET_MENU
+
+
+:LIVE_NET_MONITOR
+:: 'cls' clears the previous table so the new one starts at the top
+cls
+echo ==========================================================================
+echo           LIVE TRAFFIC MONITOR WITH GEOLOCATION INTELLIGENCE
+echo ==========================================================================
+echo [*] Fetching Network Streams from Device...
+
+:: Logic update idea
+if "!state!"=="ESTABLISHED" (
+    set "owner_info=[UID:!uid!]"
+) else (
+    set "owner_info=[System/Kernel Handover]"
+)
+
+:: Use -tuapne to ensure the UID is included in the output
+%ADB% shell "netstat -tuapne" > bin\temp_net.txt 2>nul
+
+:: Call Python to analyze and print the results
+python bin\ip_analyzer.py bin\temp_net.txt
+
+echo --------------------------------------------------------------------------
+echo [R] REFRESH STREAM   [0] RETURN TO MENU
+echo --------------------------------------------------------------------------
+set /p net_opt="[?] SELECT ACTION: "
+
+:: /i makes it work for both 'r' and 'R'
+if /i "%net_opt%"=="R" goto LIVE_NET_MONITOR
+if "%net_opt%"=="0" goto NETWORK_INTELLIGENCE_MENU
+
+:: If they press anything else, just refresh anyway
+goto LIVE_NET_MONITOR
+
+:IP_REPUTATION_CHECKER
+cls
+echo ==========================================================================
+echo                      IP REPUTATION , ORIGIN CHECKER
+echo ==========================================================================
+echo [!] PASTE RAW LOG DATA BELOW (Right-click to Paste)
+echo [!] To Process: Press ENTER, then CTRL+Z, then ENTER.
+echo --------------------------------------------------------------------------
+more > bin\user_input.txt
+echo.
+echo [*] Analyzing IP Origins and Intelligence...
+python bin\ip_analyzer.py bin\user_input.txt
+pause
+goto NETWORK_INTELLIGENCE_MENU
+
+
+:UID_RESOLVER_TOOL
+cls
+color 0B
+echo ==========================================================================
+echo                ANDROID SYSTEM UID ^& PACKAGE RESOLVER
+echo ==========================================================================
+echo  [STATUS] Fetching installed packages and their UIDs...
+echo.
+echo  %-12s ^| %-50s
+echo  --------------------------------------------------------------------------
+
+:: Loop through all packages and pull their specific userId (UID)
+for /f "tokens=2 delims=:" %%P in ('%ADB% shell pm list packages') do (
+    set "full_pkg=%%P"
+    :: Remove any hidden carriage returns or spaces to fix the naming issue
+    set "pkg=!full_pkg: =!"
+    
+    :: Extract the numerical UID using dumpsys for better accuracy
+    for /f "tokens=1" %%U in ('%ADB% shell "dumpsys package !pkg! | grep userId="') do (
+        set "uid_line=%%U"
+        set "uid_val=!uid_line:userId=!"
+        
+        :: Print the result in a clean table format
+        echo  UID: !uid_val!	^| Package: !pkg!
+    )
+)
+
+echo --------------------------------------------------------------------------
+echo [+] Total packages resolved.
+echo.
+echo [1] Search for specific UID
+echo [0] Back to Network Intelligence
+set /p uid_choice="[?] SELECT ACTION: "
+
+if "%uid_choice%"=="1" (
+    set /p search_uid="Enter UID to find (e.g. 10145): "
+    cls
+    echo Searching for UID: !search_uid!
+    echo ------------------------------------------------------------
+    %ADB% shell pm list packages -u | findstr "!search_uid!"
+    pause
+    goto UID_RESOLVER_TOOL
+)
+if "%uid_choice%"=="0" goto NETWORK_INTELLIGENCE_MENU
+goto UID_RESOLVER_TOOL
